@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+{% block header_title %}Overview Dashboard{% endblock %}
+
+{% block content %}
+<!-- Metric Cards -->
+<div class="stats-grid">
+    <div class="stat-card primary">
+        <div>
+            <div class="stat-label">Total Students</div>
+            <div class="stat-value">{{ total_students }}</div>
+        </div>
+        <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        </div>
+    </div>
+
+    <div class="stat-card success">
+        <div>
+            <div class="stat-label">Active Students</div>
+            <div class="stat-value">{{ active_students }}</div>
+        </div>
+        <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        </div>
+    </div>
+
+    <div class="stat-card warning">
+        <div>
+            <div class="stat-label">Inactive / On Leave</div>
+            <div class="stat-value">{{ inactive_students }}</div>
+        </div>
+        <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+        </div>
+    </div>
+
+    <div class="stat-card secondary">
+        <div>
+            <div class="stat-label">Departments</div>
+            <div class="stat-value">{{ departments_count }}</div>
+        </div>
+        <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+        </div>
+    </div>
+</div>
+
+<!-- Main Dashboard Grid -->
+<div class="dashboard-grid">
+    <!-- Recent Students Table Card -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Recent Students</div>
+            <a href="{% url 'student_list' %}" class="btn btn-secondary btn-sm">View All Records</a>
+        </div>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Register No</th>
+                        <th>Student</th>
+                        <th>Department</th>
+                        <th>Year</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in recent_students %}
+                    <tr>
+                        <td><span class="reg-badge">{{ student.register_number }}</span></td>
+                        <td>
+                            <div class="student-name-cell">
+                                <div class="avatar-initials">{{ student.name|first }}</div>
+                                <div class="student-details-compact">
+                                    <div class="name">{{ student.name }}</div>
+                                    <div class="email">{{ student.email }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="dept-pill">{{ student.department }}</span></td>
+                        <td>Year {{ student.year }}</td>
+                        <td>
+                            <span class="status-pill {% if student.status == 'Active' %}active{% else %}inactive{% endif %}">
+                                {{ student.status }}
+                            </span>
+                        </td>
+                        <td style="text-align: right;">
+                            <div class="action-buttons" style="justify-content: flex-end;">
+                                <a href="{% url 'student_detail' student.pk %}" class="btn-icon view" title="View Profile">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                </a>
+                                <a href="{% url 'student_edit' student.pk %}" class="btn-icon edit" title="Edit Student">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 2rem; color: var(--gray-400);">
+                            No students registered yet. Click "Add Student" to create your first record.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Department Distribution Card -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Department Distribution</div>
+        </div>
+        <div class="card-body">
+            <div class="dept-list">
+                {% for item in dept_stats %}
+                <div class="dept-item">
+                    <div class="dept-header">
+                        <span class="dept-name">{{ item.department }}</span>
+                        <span class="dept-count">{{ item.count }} ({{ item.percentage }}%)</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" style="width: {{ item.percentage }}%;"></div>
+                    </div>
+                </div>
+                {% empty %}
+                <div style="color: var(--gray-400); text-align: center; padding: 1.5rem;">
+                    No department data available.
+                </div>
+                {% endfor %}
+            </div>
+
+            <div style="margin-top: 2rem; padding-top: 1.25rem; border-top: 1px solid var(--gray-200);">
+                <div style="font-size: 0.82rem; font-weight: 600; color: var(--gray-500); text-transform: uppercase; margin-bottom: 0.75rem;">
+                    Quick Actions
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <a href="{% url 'student_add' %}" class="btn btn-primary" style="justify-content: flex-start;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        <span>Add New Student</span>
+                    </a>
+                    <a href="{% url 'student_list' %}" class="btn btn-secondary" style="justify-content: flex-start;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                        <span>Search & Filter Directory</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
