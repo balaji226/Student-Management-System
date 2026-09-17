@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Student - {{ student.name }}{% endblock %}
+{% block header_title %}Edit Student Record{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 900px; margin: 0 auto;">
+    <div class="card-header">
+        <div class="card-title">Modify Record: {{ student.name }} ({{ student.register_number }})</div>
+        <a href="{% url 'student_detail' student.pk %}" class="btn btn-secondary btn-sm">&larr; View Profile</a>
+    </div>
+
+    <div class="card-body">
+        <form id="studentForm" method="POST" action="{% url 'student_edit' student.pk %}" novalidate>
+            {% csrf_token %}
+
+            <div class="form-grid">
+                <!-- Register Number -->
+                <div class="form-group">
+                    <label for="register_number" class="form-label">
+                        Register Number <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        name="register_number" 
+                        id="register_number" 
+                        class="form-control {% if errors.register_number %}is-invalid{% endif %}"
+                        value="{{ form_data.register_number|default:student.register_number }}"
+                        required
+                    >
+                    <div class="invalid-feedback">
+                        {{ errors.register_number.0|default:"Please enter a valid register number." }}
+                    </div>
+                </div>
+
+                <!-- Full Name -->
+                <div class="form-group">
+                    <label for="name" class="form-label">
+                        Full Name <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        name="name" 
+                        id="name" 
+                        class="form-control {% if errors.name %}is-invalid{% endif %}"
+                        value="{{ form_data.name|default:student.name }}"
+                        required
+                    >
+                    <div class="invalid-feedback">
+                        {{ errors.name.0|default:"Please enter student name." }}
+                    </div>
+                </div>
+
+                <!-- Email Address -->
+                <div class="form-group">
+                    <label for="email" class="form-label">
+                        Email Address <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="email" 
+                        name="email" 
+                        id="email" 
+                        class="form-control {% if errors.email %}is-invalid{% endif %}"
+                        value="{{ form_data.email|default:student.email }}"
+                        required
+                    >
+                    <div class="invalid-feedback">
+                        {{ errors.email.0|default:"Please enter a valid unique email address." }}
+                    </div>
+                </div>
+
+                <!-- Phone Number -->
+                <div class="form-group">
+                    <label for="phone" class="form-label">
+                        Phone Number <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="tel" 
+                        name="phone" 
+                        id="phone" 
+                        class="form-control {% if errors.phone %}is-invalid{% endif %}"
+                        value="{{ form_data.phone|default:student.phone }}"
+                        required
+                    >
+                    <div class="invalid-feedback">
+                        {{ errors.phone.0|default:"Please enter a valid 10-digit phone number." }}
+                    </div>
+                </div>
+
+                <!-- Date of Birth -->
+                <div class="form-group">
+                    <label for="date_of_birth" class="form-label">
+                        Date of Birth <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="date" 
+                        name="date_of_birth" 
+                        id="date_of_birth" 
+                        class="form-control {% if errors.date_of_birth %}is-invalid{% endif %}"
+                        value="{{ form_data.date_of_birth|default:student.date_of_birth|date:'Y-m-d' }}"
+                        required
+                    >
+                    <div class="invalid-feedback">
+                        {{ errors.date_of_birth.0|default:"Please provide a valid date of birth in the past." }}
+                    </div>
+                </div>
+
+                <!-- Gender -->
+                <div class="form-group">
+                    <label for="gender" class="form-label">Gender <span class="required">*</span></label>
+                    <select name="gender" id="gender" class="form-control" required>
+                        {% for code, label in genders %}
+                        <option value="{{ code }}" {% if form_data.gender == code or student.gender == code %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Department -->
+                <div class="form-group">
+                    <label for="department" class="form-label">Department <span class="required">*</span></label>
+                    <select name="department" id="department" class="form-control" required>
+                        {% for code, label in departments %}
+                        <option value="{{ code }}" {% if form_data.department == code or student.department == code %}selected{% endif %}>{{ code }} - {{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Year of Study -->
+                <div class="form-group">
+                    <label for="year" class="form-label">Year of Study <span class="required">*</span></label>
+                    <select name="year" id="year" class="form-control" required>
+                        {% for code, label in years %}
+                        <option value="{{ code }}" {% if form_data.year == code or student.year == code %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Section -->
+                <div class="form-group">
+                    <label for="section" class="form-label">Section <span class="required">*</span></label>
+                    <select name="section" id="section" class="form-control" required>
+                        {% for code, label in sections %}
+                        <option value="{{ code }}" {% if form_data.section == code or student.section == code %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Admission Date -->
+                <div class="form-group">
+                    <label for="admission_date" class="form-label">Admission Date <span class="required">*</span></label>
+                    <input 
+                        type="date" 
+                        name="admission_date" 
+                        id="admission_date" 
+                        class="form-control {% if errors.admission_date %}is-invalid{% endif %}"
+                        value="{{ form_data.admission_date|default:student.admission_date|date:'Y-m-d' }}"
+                        required
+                    >
+                    <div class="invalid-feedback">
+                        {{ errors.admission_date.0|default:"Please select admission date." }}
+                    </div>
+                </div>
+
+                <!-- Status -->
+                <div class="form-group">
+                    <label for="status" class="form-label">Status <span class="required">*</span></label>
+                    <select name="status" id="status" class="form-control" required>
+                        {% for code, label in statuses %}
+                        <option value="{{ code }}" {% if form_data.status == code or student.status == code %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Address -->
+                <div class="form-group full-width">
+                    <label for="address" class="form-label">Residential Address</label>
+                    <textarea 
+                        name="address" 
+                        id="address" 
+                        rows="3" 
+                        class="form-control"
+                    >{{ form_data.address|default:student.address|default:'' }}</textarea>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="form-actions">
+                <a href="{% url 'student_detail' student.pk %}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                    <span>Update Student Record</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
